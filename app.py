@@ -29,32 +29,34 @@ def fetch_data(ticker):
         return pd.DataFrame()
 
 # --- Indicator Calculation ---
+# --- Indicator Calculation ---
 def add_indicators(df):
-    df['RSI'] = ta.momentum.RSIIndicator(df['Close']).rsi()
-    df['MACD'] = ta.trend.MACD(df['Close']).macd()
-    df['EMA_20'] = ta.trend.EMAIndicator(df['Close'], window=20).ema_indicator()
-    df['SMA_50'] = ta.trend.SMAIndicator(df['Close'], window=50).sma_indicator()
-    return df
-
+    if 'RSI' in indicators:
+        df['RSI'] = ta.momentum.RSIIndicator(df['Close']).rsi()
 
     if 'MACD' in indicators:
         macd = ta.trend.MACD(df['Close'])
         df['MACD'] = macd.macd()
         df['MACD_Signal'] = macd.macd_signal()
+
     if 'SMA_20' in indicators:
         df['SMA_20'] = df['Close'].rolling(20).mean()
     if 'SMA_50' in indicators:
         df['SMA_50'] = df['Close'].rolling(50).mean()
+
     if 'EMA_20' in indicators:
         df['EMA_20'] = df['Close'].ewm(span=20).mean()
     if 'EMA_50' in indicators:
         df['EMA_50'] = df['Close'].ewm(span=50).mean()
+
     if 'BBANDS' in indicators:
         bb = ta.volatility.BollingerBands(df['Close'])
         df['BB_H'] = bb.bollinger_hband()
         df['BB_L'] = bb.bollinger_lband()
-    if 'VWAP' in indicators:
+
+    if 'VWAP' in indicators and 'Volume' in df.columns:
         df['VWAP'] = (df['Close'] * df['Volume']).cumsum() / df['Volume'].cumsum()
+
     return df
 
 # --- Chart Drawing ---
