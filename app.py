@@ -22,34 +22,33 @@ indicators = st.sidebar.multiselect("Technical Indicators", ['MACD', 'RSI', 'SMA
 show_volume = st.sidebar.toggle("Show Volume", value=True)
 
 # --- Helper Functions ---
-def fetch_data(ticker):
-    try:
-        df = yf.download(ticker, period=period, interval=interval)
-        return df.dropna()
-    except Exception as e:
-        st.error(f"Error fetching data for {ticker}: {e}")
-        return pd.DataFrame()
-
- def add_indicators(df, selected):
-    close = df['Close'].squeeze()  # Ensure it's a Series
+def add_indicators(df, selected):
+    close = df['Close'].squeeze()  # Ensure it's a 1D Series
 
     if 'RSI' in selected:
         df['RSI'] = ta.momentum.RSIIndicator(close=close).rsi()
+
     if 'MACD' in selected:
         macd = ta.trend.MACD(close=close)
         df['MACD'] = macd.macd()
         df['MACD_Signal'] = macd.macd_signal()
+
     if 'SMA' in selected:
         df['SMA'] = close.rolling(window=20).mean()
+
     if 'EMA' in selected:
         df['EMA'] = close.ewm(span=20).mean()
+
     if 'BBANDS' in selected:
         bb = ta.volatility.BollingerBands(close=close)
         df['BB_H'] = bb.bollinger_hband()
         df['BB_L'] = bb.bollinger_lband()
+
     if 'VWAP' in selected and 'Volume' in df.columns:
         df['VWAP'] = (close * df['Volume']).cumsum() / df['Volume'].cumsum()
+
     return df
+
 
 
 def draw_chart(df, ticker):
