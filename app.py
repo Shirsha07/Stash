@@ -87,6 +87,14 @@ def draw_chart(df, ticker):
 
     fig.update_layout(template='plotly_dark', height=900, margin=dict(t=30, b=30))
     st.plotly_chart(fig, use_container_width=True)
+# --- Fetch Data Function ---
+def fetch_data(ticker):
+    try:
+        df = yf.download(ticker, period=period, interval=interval)
+        return df.dropna()
+    except Exception as e:
+        st.error(f"Error fetching data for {ticker}: {e}")
+        return pd.DataFrame()
 
 # --- Main App Logic ---
 ticker_list = [t.strip().upper() for t in tickers_input.split(",")][:10]
