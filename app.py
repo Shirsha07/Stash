@@ -29,10 +29,14 @@ def fetch_data(ticker):
         return pd.DataFrame()
 
 # --- Indicator Calculation ---
-def add_indicators(data):
-    df = data.copy()
-    if 'RSI' in indicators:
-        df['RSI'] = ta.momentum.RSIIndicator(df['Close']).rsi()
+def add_indicators(df):
+    df['RSI'] = ta.momentum.RSIIndicator(df['Close']).rsi()
+    df['MACD'] = ta.trend.MACD(df['Close']).macd()
+    df['EMA_20'] = ta.trend.EMAIndicator(df['Close'], window=20).ema_indicator()
+    df['SMA_50'] = ta.trend.SMAIndicator(df['Close'], window=50).sma_indicator()
+    return df
+
+
     if 'MACD' in indicators:
         macd = ta.trend.MACD(df['Close'])
         df['MACD'] = macd.macd()
