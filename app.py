@@ -50,7 +50,6 @@ def add_indicators(df, selected):
     return df
 
 
-
 def draw_chart(df, ticker):
     fig = make_subplots(
         rows=3, cols=1, shared_xaxes=True,
