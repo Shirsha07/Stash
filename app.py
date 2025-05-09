@@ -30,24 +30,27 @@ def fetch_data(ticker):
         st.error(f"Error fetching data for {ticker}: {e}")
         return pd.DataFrame()
 
-def add_indicators(df, selected):
+ def add_indicators(df, selected):
+    close = df['Close'].squeeze()  # Ensure it's a Series
+
     if 'RSI' in selected:
-        df['RSI'] = ta.momentum.RSIIndicator(close=df['Close']).rsi()
+        df['RSI'] = ta.momentum.RSIIndicator(close=close).rsi()
     if 'MACD' in selected:
-        macd = ta.trend.MACD(close=df['Close'])
+        macd = ta.trend.MACD(close=close)
         df['MACD'] = macd.macd()
         df['MACD_Signal'] = macd.macd_signal()
     if 'SMA' in selected:
-        df['SMA'] = df['Close'].rolling(window=20).mean()
+        df['SMA'] = close.rolling(window=20).mean()
     if 'EMA' in selected:
-        df['EMA'] = df['Close'].ewm(span=20).mean()
+        df['EMA'] = close.ewm(span=20).mean()
     if 'BBANDS' in selected:
-        bb = ta.volatility.BollingerBands(close=df['Close'])
+        bb = ta.volatility.BollingerBands(close=close)
         df['BB_H'] = bb.bollinger_hband()
         df['BB_L'] = bb.bollinger_lband()
     if 'VWAP' in selected and 'Volume' in df.columns:
-        df['VWAP'] = (df['Close'] * df['Volume']).cumsum() / df['Volume'].cumsum()
+        df['VWAP'] = (close * df['Volume']).cumsum() / df['Volume'].cumsum()
     return df
+
 
 def draw_chart(df, ticker):
     fig = make_subplots(
